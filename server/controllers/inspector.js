@@ -40,7 +40,9 @@ export const registerInspector = async (req, res) => {
             return res.status(400).json({ message: "At least one KYC document (Aadhaar or PAN) is required." });
         }
 
-        const existingInspector = await Inspector.findOne({ email });
+        const normalizedEmail = email.trim().toLowerCase();
+
+        const existingInspector = await Inspector.findOne({ email: normalizedEmail });
         if (existingInspector) {
             return res.status(409).json({
                 success: false,
@@ -48,7 +50,7 @@ export const registerInspector = async (req, res) => {
             });
         }
 
-        const existingUser = await User.findOne({ email });
+        const existingUser = await User.findOne({ email: normalizedEmail });
         if (existingUser) {
             return res.status(409).json({
                 success: false,
@@ -97,7 +99,7 @@ export const registerInspector = async (req, res) => {
 
         const inspector = await Inspector.create({
             fullName,
-            email,
+            email: normalizedEmail,
             password: hashedPassword,
             phone,
             dateOfBirth,
@@ -163,7 +165,7 @@ export const loginInspector = async (req, res) => {
             });
         }
 
-        const existingInspector = await Inspector.findOne({ email });
+        const existingInspector = await Inspector.findOne({ email: email.trim().toLowerCase() });
 
         if (!existingInspector) {
             return res.status(404).json({

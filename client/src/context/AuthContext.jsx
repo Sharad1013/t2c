@@ -58,11 +58,18 @@ export function AuthProvider({ children }) {
         throw userErr
       }
 
-      const data = await loginInspectorApi({ email, password })
-      localStorage.setItem('t2c_token', data.token)
-      localStorage.setItem('t2c_role', 'inspector')
-      await fetchUser()
-      return { ...data, role: 'inspector' }
+      try {
+        const data = await loginInspectorApi({ email, password })
+        localStorage.setItem('t2c_token', data.token)
+        localStorage.setItem('t2c_role', 'inspector')
+        await fetchUser()
+        return { ...data, role: 'inspector' }
+      } catch (inspectorErr) {
+        if (inspectorErr.message === 'No inspector found with this email.') {
+          throw new Error('No account found with this email. Please sign up or check your email.')
+        }
+        throw inspectorErr
+      }
     }
   }
 

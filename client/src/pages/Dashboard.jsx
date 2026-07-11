@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { Bell, Calendar, Coins, Leaf, Package, Recycle } from 'lucide-react'
+import { Bell, Calendar, Coins, KeyRound, Leaf, Package, Recycle } from 'lucide-react'
 import { useAuth } from '../context/AuthContext'
 import { getPickupHistory } from '../api/pickups'
 import StatCard from '../components/StatCard'
@@ -53,6 +53,30 @@ export default function Dashboard() {
       {error && (
         <div className="mb-6">
           <Alert type="error" message={error} />
+        </div>
+      )}
+
+      {user?.otp && (
+        <div className="mb-8 rounded-2xl border border-amber-500/30 bg-gradient-to-br from-amber-500/15 to-orange-600/5 p-6">
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+            <div className="flex items-start gap-4">
+              <div className="rounded-xl bg-amber-500/20 p-3 text-amber-400">
+                <KeyRound className="h-6 w-6" />
+              </div>
+              <div>
+                <h2 className="font-display text-lg font-semibold">Your Pickup OTP</h2>
+                <p className="mt-1 text-sm text-slate-400">
+                  Share this code with the inspector when they arrive for pickup verification.
+                </p>
+              </div>
+            </div>
+            <div className="rounded-xl border border-amber-500/30 bg-black/20 px-6 py-4 text-center">
+              <p className="text-xs font-medium uppercase tracking-widest text-amber-400/80">OTP</p>
+              <p className="mt-1 font-display text-3xl font-bold tracking-[0.3em] text-white">
+                {user.otp}
+              </p>
+            </div>
+          </div>
         </div>
       )}
 

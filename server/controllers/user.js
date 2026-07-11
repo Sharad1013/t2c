@@ -2,6 +2,8 @@ import { User } from "../models/user.js";
 import { Inspector } from "../models/inspector.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
+import { generateOTP } from "../utils/otpGenerator.js";
+
 export const registerUser = async (req, res) => {
     try {
         const { firstName, lastName, phone, email, password, address } = req.body;
@@ -17,9 +19,9 @@ export const registerUser = async (req, res) => {
         }
 
         // if all fields are present move forward.
-
         // 1. find whether the mail exists.
-        const existingUser = await User.findOne({ email });
+        const normalizedEmail = email.trim().toLowerCase();
+        const existingUser = await User.findOne({ email: normalizedEmail });
         if (existingUser) {
             return res.status(404)
                 .json({
@@ -27,7 +29,7 @@ export const registerUser = async (req, res) => {
                 })
         }
 
-        const existingInspector = await Inspector.findOne({ email });
+        const existingInspector = await Inspector.findOne({ email: normalizedEmail });
         if (existingInspector) {
             return res.status(409).json({
                 message: "This email is registered as an inspector. Use a different email for a user account.",
@@ -35,7 +37,6 @@ export const registerUser = async (req, res) => {
         }
 
         // 2. if not found then bcrypt the password
-
         const hashedPassword = await bcrypt.hash(password, 10);
 
         const newUser = await User.create(
@@ -45,7 +46,8 @@ export const registerUser = async (req, res) => {
                 phone,
                 email,
                 password: hashedPassword,
-                address
+                address,
+                otp: generateOTP()
             })
 
         if (newUser) {
@@ -82,7 +84,7 @@ export const loginUser = async (req, res) => {
         }
 
         // bcrypt compare the password if the user exists
-        const existingUser = await User.findOne({ email });
+        const existingUser = await User.findOne({ email: email.trim().toLowerCase() });
 
         if (!existingUser) {
             return res.status(404)
@@ -140,7 +142,7 @@ export const loginUser = async (req, res) => {
 
 export const getLoggedInUser = async (req, res) => {
     try {
-        const user = await User.findById(req.user.userId);
+        const user = await User.findById(req.user.userId).select("-password");
         if (!user) {
             return res.status(404)
                 .json({
