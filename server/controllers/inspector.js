@@ -282,3 +282,83 @@ export const toggleInspectorAvailability = async (req, res) => {
         });
     }
 };
+
+export const updateInspector = async (req, res) => {
+    try {
+        if (req.user.role !== "inspector") {
+            return res.status(403).json({
+                success: false,
+                message: "Access denied. Inspector account required.",
+            });
+        }
+
+        const {
+            fullName,
+            phone,
+            "address.street": street,
+            "address.city": city,
+            "address.state": state,
+            "address.pincode": pincode,
+            "bankDetails.accountHolderName": accountHolderName,
+            "bankDetails.accountNumber": accountNumber,
+            "bankDetails.ifscCode": ifscCode,
+            "bankDetails.upiId": upiId,
+            "vehicle.name": vehicleName,
+            "vehicle.registrationNumber": vehicleRegNumber,
+            "vehicle.type": vehicleType,
+        } = req.body;
+
+        const updates = {};
+
+        if (fullName) updates.fullName = fullName;
+        if (phone) updates.phone = phone;
+        if (street || city || state || pincode) {
+            updates.address = {};
+            if (street) updates.address.street = street;
+            if (city) updates.address.city = city;
+            if (state) updates.address.state = state;
+            if (pincode) updates.address.pincode = pincode;
+        }
+        if (accountHolderName || accountNumber || ifscCode || upiId) {
+            updates.bankDetails = {};
+            if (accountHolderName) updates.bankDetails.accountHolderName = accountHolderName;
+            if (accountNumber) updates.bankDetails.accountNumber = accountNumber;
+            if (ifscCode) updates.bankDetails.ifscCode = ifscCode;
+            if (upiId) updates.bankDetails.upiId = upiId;
+        }
+        if (vehicleName || vehicleRegNumber || vehicleType) {
+            updates.vehicle = {};
+            if (vehicleName) updates.vehicle.name = vehicleName;
+            if (vehicleRegNumber) updates.vehicle.registrationNumber = vehicleRegNumber;
+            if (vehicleType) updates.vehicle.type = vehicleType;
+        }
+
+        // handle profile photo upload
+        const files = req.files || {};
+        if (files.profilePhoto?.[0]) {
+            const uploaded = await uploadToCloudinary(files.profilePhoto[0].buffer, "inspector-profiles");
+            updates.profilePhoto = uploaded.secure_url;
+        }
+
+        const updatedInspector = await Inspector.findByIdAndUpdate(
+            req.user.userId,
+            { $set: updates },
+            { new: true, runValidators: true }
+        ).select("-password");
+
+        if (!updatedInspector) {
+            return res.status(404).json({ success: false, message: "Inspector not found." });
+        }
+
+        return res.status(200).json({
+            success: true,
+            message: "Profile updated successfully.",
+            inspector: updatedInspector,
+        });
+    } catch (err) {
+        return res.status(500).json({
+            success: false,
+            message: `Error while updating inspector profile: ${err.message}`,
+        });
+    }
+};

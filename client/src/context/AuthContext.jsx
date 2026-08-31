@@ -90,10 +90,11 @@ export function AuthProvider({ children }) {
   }
 
   const isInspector = role === 'inspector'
+  const isAdmin = role === 'admin'
 
   return (
     <AuthContext.Provider
-      value={{ user, role, loading, isInspector, login, register, logout, fetchUser, updateLocalUser }}
+      value={{ user, role, loading, isInspector, isAdmin, login, register, logout, fetchUser, updateLocalUser }}
     >
       {children}
     </AuthContext.Provider>

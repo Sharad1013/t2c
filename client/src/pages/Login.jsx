@@ -23,7 +23,12 @@ export default function Login() {
 
     try {
       const data = await login(email, password)
-      const redirectTo = data.role === 'inspector' ? '/inspector/dashboard' : from
+      const redirectTo =
+        data.role === 'inspector'
+          ? '/inspector/dashboard'
+          : data.role === 'admin'
+            ? '/dashboard'
+            : from
       navigate(redirectTo, { replace: true, state: { welcome: data.message } })
     } catch (err) {
       setError(err.message)

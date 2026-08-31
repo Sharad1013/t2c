@@ -1,5 +1,5 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
-import { AuthProvider } from './context/AuthContext'
+import { AuthProvider, useAuth } from './context/AuthContext'
 import Navbar from './components/Navbar'
 import Footer from './components/Footer'
 import ProtectedRoute from './components/ProtectedRoute'
@@ -8,10 +8,18 @@ import Login from './pages/Login'
 import Register from './pages/Register'
 import RegisterInspector from './pages/RegisterInspector'
 import Dashboard from './pages/Dashboard'
+import AdminDashboard from './pages/AdminDashboard'
 import InspectorDashboard from './pages/InspectorDashboard'
+import InspectorProfile from './pages/InspectorProfile'
 import SchedulePickup from './pages/SchedulePickup'
 import PickupHistory from './pages/PickupHistory'
 import Profile from './pages/Profile'
+
+function DashboardGate() {
+  const { role } = useAuth()
+  if (role === 'admin') return <AdminDashboard />
+  return <Dashboard />
+}
 
 function Layout({ children }) {
   return (
@@ -37,7 +45,7 @@ export default function App() {
               path="/dashboard"
               element={
                 <ProtectedRoute allowedRoles={['user', 'admin']}>
-                  <Dashboard />
+                  <DashboardGate />
                 </ProtectedRoute>
               }
             />
@@ -50,9 +58,17 @@ export default function App() {
               }
             />
             <Route
+              path="/inspector/profile"
+              element={
+                <ProtectedRoute allowedRoles={['inspector']}>
+                  <InspectorProfile />
+                </ProtectedRoute>
+              }
+            />
+            <Route
               path="/schedule"
               element={
-                <ProtectedRoute allowedRoles={['user', 'admin']}>
+                <ProtectedRoute allowedRoles={['user']}>
                   <SchedulePickup />
                 </ProtectedRoute>
               }
@@ -60,7 +76,7 @@ export default function App() {
             <Route
               path="/history"
               element={
-                <ProtectedRoute allowedRoles={['user', 'admin']}>
+                <ProtectedRoute allowedRoles={['user']}>
                   <PickupHistory />
                 </ProtectedRoute>
               }

@@ -45,3 +45,10 @@ export async function toggleInspectorAvailability() {
   const { data } = await inspectorApi.patch('/inspectors/availability')
   return data
 }
+
+export async function updateInspectorProfile(formData) {
+  const { data } = await inspectorApi.patch('/inspectors/me', formData, {
+    headers: { 'Content-Type': 'multipart/form-data' },
+  })
+  return data
+}

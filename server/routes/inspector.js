@@ -4,6 +4,7 @@ import {
     loginInspector,
     getLoggedInInspector,
     toggleInspectorAvailability,
+    updateInspector,
 } from "../controllers/inspector.js";
 import { authMiddleware } from "../middlewares/authMiddleware.js";
 import upload from "../middlewares/multer.js";
@@ -22,7 +23,13 @@ router.route("/register").post(
 );
 
 router.route("/login").post(loginInspector);
-router.route("/me").get(authMiddleware, getLoggedInInspector);
+router.route("/me")
+    .get(authMiddleware, getLoggedInInspector)
+    .patch(
+        authMiddleware,
+        upload.fields([{ name: "profilePhoto", maxCount: 1 }]),
+        updateInspector
+    );
 router.route("/availability").patch(authMiddleware, toggleInspectorAvailability);
 
 export default router;

@@ -43,3 +43,53 @@ export const analyzeWasteImages = async (files) => {
     const clean = text.replace(/```json|```/g, "").trim();
     return JSON.parse(clean);
 }
+
+export const compareWasteImages = async (originalImageUrls, inspectorFiles) => {
+    // fetch every user original from Cloudinary → inlineData part
+    const originalParts = await Promise.all(
+        originalImageUrls.map(async (url) => {
+            const res = await fetch(url);
+            const buffer = Buffer.from(await res.arrayBuffer());
+            return {
+                inlineData: {
+                    data: buffer.toString("base64"),
+                    mimeType: "image/jpeg",   // Cloudinary transforms to jpeg by default; adjust if you store png
+                },
+            };
+        })
+    );
+
+    // every inspector upload → inlineData part (same shape as analyzeWasteImages)
+    const inspectorParts = inspectorFiles.map((file) => ({
+        inlineData: {
+            data: file.buffer.toString("base64"),
+            mimeType: file.mimetype,
+        },
+    }));
+
+    const prompt = `
+You are verifying a waste pickup for Trash2Cash.
+You are given ${originalParts.length} image(s) taken by the USER when they requested
+the pickup, followed by ${inspectorParts.length} image(s) just taken by the INSPECTOR
+at the location.
+Compare the two SETS as a whole. Decide whether they show the same waste at plausibly
+the same place, allowing for different angle, lighting, and time of day.
+Respond ONLY with JSON, no markdown:
+{ "match": boolean, "confidence": number (0-100), "reason": string }
+`;
+
+    const model = genAI.getGenerativeModel({ model: "gemini-3.5-flash" });
+
+    // label each group with a text part so the model can tell user vs inspector
+    const result = await model.generateContent([
+        prompt,
+        "USER IMAGES:",
+        ...originalParts,
+        "INSPECTOR IMAGES:",
+        ...inspectorParts,
+    ]);
+
+    const text = result.response.text();
+    const clean = text.replace(/```json|```/g, "").trim();
+    return JSON.parse(clean);
+};

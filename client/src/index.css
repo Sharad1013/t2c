@@ -1,5 +1,32 @@
 @import "tailwindcss";
 
+@keyframes pop {
+  0%   { transform: scale(0); opacity: 0; }
+  70%  { transform: scale(1.15); }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+@keyframes drive {
+  0%   { left: -2.5rem; }
+  50%  { left: 55%; }        /* slight hang in the middle from ease-in-out */
+  100% { left: 105%; }
+}
+
+@keyframes road {
+  0%   { transform: translateX(0); }
+  100% { transform: translateX(-50%); }   /* half, because the strip is 200% wide → seamless loop */
+}
+
+@keyframes scenery {
+  0%   { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+@keyframes puff {
+  0%   { opacity: 0.6; transform: translateX(0) scale(1); }
+  100% { opacity: 0;   transform: translateX(-8px) scale(1.8); }
+}
+
 @theme {
   --font-sans: "DM Sans", ui-sans-serif, system-ui, sans-serif;
   --font-display: "Outfit", ui-sans-serif, system-ui, sans-serif;

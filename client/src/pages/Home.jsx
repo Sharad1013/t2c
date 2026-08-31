@@ -55,7 +55,7 @@ const steps = [
 ]
 
 export default function Home() {
-  const { user } = useAuth()
+  const { user, isInspector, isAdmin } = useAuth()
 
   return (
     <div>
@@ -84,7 +84,23 @@ export default function Home() {
             </p>
 
             <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
-              {user ? (
+              {isInspector ? (
+                <Link
+                  to="/inspector/dashboard"
+                  className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 px-8 py-3.5 font-semibold text-white shadow-xl shadow-blue-500/25 transition hover:from-blue-500 hover:to-indigo-500"
+                >
+                  <Truck className="h-5 w-5" />
+                  Go to Inspector Dashboard
+                </Link>
+              ) : isAdmin ? (
+                <Link
+                  to="/dashboard"
+                  className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-violet-600 to-indigo-600 px-8 py-3.5 font-semibold text-white shadow-xl shadow-violet-500/25 transition hover:from-violet-500 hover:to-indigo-500"
+                >
+                  <Shield className="h-5 w-5" />
+                  Go to Admin Dashboard
+                </Link>
+              ) : user ? (
                 <Link
                   to="/schedule"
                   className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-t2c-500 to-emerald-600 px-8 py-3.5 font-semibold text-white shadow-xl shadow-t2c-500/25 transition hover:from-t2c-400 hover:to-emerald-500"
@@ -173,28 +189,30 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Inspector CTA */}
-      <section className="border-t border-white/10 px-4 py-20 sm:px-6">
-        <div className="mx-auto max-w-4xl">
-          <div className="relative overflow-hidden rounded-3xl border border-blue-500/20 bg-gradient-to-br from-blue-950/50 to-slate-900 p-10 text-center sm:p-14">
-            <Truck className="mx-auto mb-4 h-12 w-12 text-blue-400" />
-            <h2 className="font-display text-2xl font-bold sm:text-3xl">
-              Earn by collecting recyclables
-            </h2>
-            <p className="mx-auto mt-4 max-w-lg text-slate-400">
-              Register as a Trash2Cash inspector — get nearby pickup requests,
-              earn per pickup, and help your community recycle smarter.
-            </p>
-            <Link
-              to="/register/inspector"
-              className="mt-8 inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 px-8 py-3.5 font-semibold text-white transition hover:from-blue-500 hover:to-indigo-500"
-            >
-              <Shield className="h-5 w-5" />
-              Register as an Inspector
-            </Link>
+      {/* Inspector CTA — only shown to non-inspector visitors */}
+      {!isInspector && !isAdmin && (
+        <section className="border-t border-white/10 px-4 py-20 sm:px-6">
+          <div className="mx-auto max-w-4xl">
+            <div className="relative overflow-hidden rounded-3xl border border-blue-500/20 bg-gradient-to-br from-blue-950/50 to-slate-900 p-10 text-center sm:p-14">
+              <Truck className="mx-auto mb-4 h-12 w-12 text-blue-400" />
+              <h2 className="font-display text-2xl font-bold sm:text-3xl">
+                Earn by collecting recyclables
+              </h2>
+              <p className="mx-auto mt-4 max-w-lg text-slate-400">
+                Register as a Trash2Cash inspector — get nearby pickup requests,
+                earn per pickup, and help your community recycle smarter.
+              </p>
+              <Link
+                to="/register/inspector"
+                className="mt-8 inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 px-8 py-3.5 font-semibold text-white transition hover:from-blue-500 hover:to-indigo-500"
+              >
+                <Shield className="h-5 w-5" />
+                Register as an Inspector
+              </Link>
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
+      )}
 
       {/* CTA */}
       <section className="border-t border-white/10 px-4 py-20 sm:px-6">
@@ -209,11 +227,11 @@ export default function Home() {
               is a small but meaningful financial asset.
             </p>
             <Link
-              to={user ? '/schedule' : '/register'}
+              to={isAdmin ? '/dashboard' : user ? '/schedule' : '/register'}
               className="mt-8 inline-flex items-center gap-2 rounded-xl bg-white px-8 py-3.5 font-semibold text-slate-900 transition hover:bg-slate-100"
             >
               <Calendar className="h-5 w-5" />
-              {user ? 'Schedule Your First Pickup' : 'Create Free Account'}
+              {isAdmin ? 'Open Admin Dashboard' : user ? 'Schedule Your First Pickup' : 'Create Free Account'}
             </Link>
           </div>
         </div>

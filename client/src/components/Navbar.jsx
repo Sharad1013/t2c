@@ -2,6 +2,7 @@ import { Link, NavLink, useNavigate } from 'react-router-dom'
 import { Leaf, Menu, X, Coins, LogOut, User, ShieldCheck } from 'lucide-react'
 import { useState } from 'react'
 import { useAuth } from '../context/AuthContext'
+import NotificationsDropdown from './NotificationsDropdown'
 
 const navLinkClass = ({ isActive }) =>
   `rounded-lg px-3 py-2 text-sm font-medium transition-colors ${
@@ -18,7 +19,7 @@ const inspectorNavLinkClass = ({ isActive }) =>
   }`
 
 export default function Navbar() {
-  const { user, isInspector, logout } = useAuth()
+  const { user, isInspector, isAdmin, logout } = useAuth()
   const navigate = useNavigate()
   const [mobileOpen, setMobileOpen] = useState(false)
 
@@ -42,7 +43,7 @@ export default function Navbar() {
               Trash<span className="text-t2c-400">2</span>Cash
             </span>
             <p className="hidden text-[10px] uppercase tracking-widest text-slate-500 sm:block">
-              {isInspector ? 'Inspector Portal' : 'Recycle · Reward · Repeat'}
+              {isInspector ? 'Inspector Portal' : isAdmin ? 'Admin Portal' : 'Recycle · Reward · Repeat'}
             </p>
           </div>
         </Link>
@@ -53,7 +54,16 @@ export default function Navbar() {
           </NavLink>
           {user ? (
             isInspector ? (
-              <NavLink to="/inspector/dashboard" className={inspectorNavLinkClass}>
+              <>
+                <NavLink to="/inspector/dashboard" className={inspectorNavLinkClass}>
+                  Dashboard
+                </NavLink>
+                <NavLink to="/inspector/profile" className={inspectorNavLinkClass}>
+                  Profile
+                </NavLink>
+              </>
+            ) : isAdmin ? (
+              <NavLink to="/dashboard" className={navLinkClass}>
                 Dashboard
               </NavLink>
             ) : (
@@ -90,7 +100,7 @@ export default function Navbar() {
         <div className="hidden items-center gap-3 md:flex">
           {user ? (
             <>
-              {!isInspector && (
+              {!isInspector && !isAdmin && (
                 <div className="flex items-center gap-1.5 rounded-full border border-coin-500/30 bg-coin-500/10 px-3 py-1.5 text-sm font-semibold text-coin-400">
                   <Coins className="h-4 w-4" />
                   <span>TrashCoins</span>
@@ -100,6 +110,12 @@ export default function Navbar() {
                 <div className="flex items-center gap-1.5 rounded-full border border-blue-500/30 bg-blue-500/10 px-3 py-1.5 text-sm font-semibold text-blue-400">
                   <ShieldCheck className="h-4 w-4" />
                   <span>Inspector</span>
+                </div>
+              )}
+              {isAdmin && (
+                <div className="flex items-center gap-1.5 rounded-full border border-violet-500/30 bg-violet-500/10 px-3 py-1.5 text-sm font-semibold text-violet-300">
+                  <ShieldCheck className="h-4 w-4" />
+                  <span>Admin</span>
                 </div>
               )}
               {!isInspector && (
@@ -116,6 +132,9 @@ export default function Navbar() {
                   <User className="h-4 w-4 text-blue-400" />
                   {displayName}
                 </span>
+              )}
+              {isInspector && (
+                <NotificationsDropdown />
               )}
               <button
                 type="button"
@@ -144,14 +163,17 @@ export default function Navbar() {
           )}
         </div>
 
-        <button
-          type="button"
-          className="rounded-lg p-2 text-slate-300 md:hidden"
-          onClick={() => setMobileOpen(!mobileOpen)}
-          aria-label="Toggle menu"
-        >
-          {mobileOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
-        </button>
+        <div className="flex items-center gap-2 md:hidden">
+          {user && isInspector && <NotificationsDropdown />}
+          <button
+            type="button"
+            className="rounded-lg p-2 text-slate-300"
+            onClick={() => setMobileOpen(!mobileOpen)}
+            aria-label="Toggle menu"
+          >
+            {mobileOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+          </button>
+        </div>
       </nav>
 
       {mobileOpen && (
@@ -165,6 +187,25 @@ export default function Navbar() {
                 <>
                   <NavLink to="/inspector/dashboard" className={inspectorNavLinkClass} onClick={() => setMobileOpen(false)}>
                     Dashboard
+                  </NavLink>
+                  <NavLink to="/inspector/profile" className={inspectorNavLinkClass} onClick={() => setMobileOpen(false)}>
+                    Profile
+                  </NavLink>
+                  <button
+                    type="button"
+                    onClick={handleLogout}
+                    className="mt-2 rounded-lg px-3 py-2 text-left text-sm font-medium text-red-400 hover:bg-white/5"
+                  >
+                    Log out
+                  </button>
+                </>
+              ) : isAdmin ? (
+                <>
+                  <NavLink to="/dashboard" className={navLinkClass} onClick={() => setMobileOpen(false)}>
+                    Dashboard
+                  </NavLink>
+                  <NavLink to="/profile" className={navLinkClass} onClick={() => setMobileOpen(false)}>
+                    Profile
                   </NavLink>
                   <button
                     type="button"

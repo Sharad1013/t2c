@@ -5,6 +5,14 @@ import connectDB from "./db/connectDb.js";
 import userRouter from "./routes/user.js";
 import pickupRouter from "./routes/pickup.js";
 import inspectorRouter from "./routes/inspector.js";
+import notificationRouter from "./routes/notificationRoutes.js";
+
+// Admin Controls
+import adminRouter from "./routes/admin.js";
+
+import "./utils/listeners/notifyInspectors.js";
+
+
 dotenv.config();
 
 
@@ -25,9 +33,15 @@ app.use((req, res, next) => {
 
 app.use(express.json());
 
+
+// Admin Controls
+app.use("/api/v1/admin", adminRouter);
+
+
 app.use("/api/v1/users", userRouter);
 app.use("/api/v1/pickups", pickupRouter);
 app.use("/api/v1/inspectors", inspectorRouter);
+app.use("/api/v1/notifications", notificationRouter);
 
 connectDB().then(() => {
     app.listen(3000, () => {

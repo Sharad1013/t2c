@@ -1,5 +1,5 @@
 import express from "express";
-import { deletePickup, getPickUpsHistoryByUserId, registerPickup } from "../controllers/pickup.js";
+import { deletePickup, getPickUpsHistoryByUserId, registerPickup, updatePickup, updatePickupStatusUsingOtp, getPickupsPerInspector, updatePickupStatusToDelivered } from "../controllers/pickup.js";
 import { authMiddleware } from "../middlewares/authMiddleware.js";
 import upload from "../middlewares/multer.js";
 
@@ -13,6 +13,17 @@ router.route("/")
 
 // delete route
 router.route("/:pickupId")
-    .delete(authMiddleware, deletePickup);
+    .delete(authMiddleware, deletePickup)
+    .patch(authMiddleware, updatePickup);
+
+router.route("/:pickupId/verify-otp")
+    .patch(authMiddleware, updatePickupStatusUsingOtp);
+
+router.route("/:inspectorId")
+    .get(authMiddleware, getPickupsPerInspector)
+
+router.route("/delivered/:pickupId")
+    .patch(authMiddleware, upload.array("images", 3), updatePickupStatusToDelivered)
+
 
 export default router;

@@ -12,6 +12,7 @@ export const PICKUP_STATUS = {
   assigned: { label: 'Inspector Assigned', color: 'bg-blue-500/20 text-blue-300 border-blue-500/30' },
   picked_up: { label: 'Picked Up', color: 'bg-t2c-500/20 text-t2c-300 border-t2c-500/30' },
   cancelled: { label: 'Cancelled', color: 'bg-red-500/20 text-red-300 border-red-500/30' },
+  delivered: { label: 'Delivered', color: 'border-t2c-500/30 bg-t2c-500/10 text-t2c-400' },
 }
 
 export const INDIAN_STATES = [
