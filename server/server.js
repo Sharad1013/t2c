@@ -9,6 +9,7 @@ import notificationRouter from "./routes/notificationRoutes.js";
 
 // Admin Controls
 import adminRouter from "./routes/admin.js";
+import ecoStoreRouter from "./routes/ecoStore.js";
 
 import "./utils/listeners/notifyInspectors.js";
 
@@ -42,6 +43,7 @@ app.use("/api/v1/users", userRouter);
 app.use("/api/v1/pickups", pickupRouter);
 app.use("/api/v1/inspectors", inspectorRouter);
 app.use("/api/v1/notifications", notificationRouter);
+app.use("/api/v1/products", ecoStoreRouter);
 
 connectDB().then(() => {
     app.listen(3000, () => {

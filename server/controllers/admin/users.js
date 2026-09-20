@@ -25,3 +25,57 @@ export const getAllUsers = async (req, res) => {
             })
     }
 }
+
+export const deleteUser = async (req, res) => {
+    const { userIdToDelete } = req.params;
+
+    if (!userIdToDelete) {
+        return res.status(400)
+            .json({
+                success: true,
+                message: `No userId found to delete.`
+            })
+    }
+
+    try {
+        // stop if the user to delete is an admin.
+        const existingUser = await User.findById({ _id: userIdToDelete });
+        let isAdmin;
+        if (existingUser) {
+            isAdmin = existingUser.role === 'admin'
+        }
+
+        if (isAdmin) {
+            return res.status(400)
+                .json(
+                    {
+                        success: false,
+                        message: `Unauthorized to delete an admin.`
+                    }
+                )
+        }
+
+        const deletedUser = await User.deleteOne({ _id: userIdToDelete });
+
+        if (!deletedUser) {
+            return res.status(400)
+                .json({
+                    success: false,
+                    message: `User deletion failed.`
+                })
+        }
+
+        return res.status(200)
+            .json({
+                success: true,
+                message: `User deleted Successfully.`,
+                deletedUser
+            })
+    } catch (error) {
+        return res.status(500)
+            .json({
+                success: false,
+                message: `Failed, While deleting the selected user.`
+            })
+    }
+}

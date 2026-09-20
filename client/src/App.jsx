@@ -14,11 +14,19 @@ import InspectorProfile from './pages/InspectorProfile'
 import SchedulePickup from './pages/SchedulePickup'
 import PickupHistory from './pages/PickupHistory'
 import Profile from './pages/Profile'
+import EcoStore from './pages/EcoStore'
+import AdminEcoStore from './pages/AdminEcoStore'
 
 function DashboardGate() {
   const { role } = useAuth()
   if (role === 'admin') return <AdminDashboard />
   return <Dashboard />
+}
+
+function StoreGate() {
+  const { role } = useAuth()
+  if (role === 'admin') return <AdminEcoStore />
+  return <EcoStore />
 }
 
 function Layout({ children }) {
@@ -86,6 +94,14 @@ export default function App() {
               element={
                 <ProtectedRoute allowedRoles={['user', 'admin']}>
                   <Profile />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/store"
+              element={
+                <ProtectedRoute allowedRoles={['user', 'admin', 'inspector']}>
+                  <StoreGate />
                 </ProtectedRoute>
               }
             />

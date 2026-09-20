@@ -86,9 +86,21 @@ const userSchema = new Schema({
         type: String,
         required: true,
     },
-    trashCoins: {
-        type: String,
-        default: "0"
+    trashCoins: { 
+        type: Number, 
+        default: 0
+    },
+    totalPickups: { 
+        type: Number, 
+        default: 0
+    },
+    wasteRecycled: {
+        type: Number, 
+        default: 0 
+    },
+    co2Saved: { 
+        type: Number, 
+        default: 0
     }
 }, { timestamps: true });
 

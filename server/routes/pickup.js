@@ -1,5 +1,5 @@
 import express from "express";
-import { deletePickup, getPickUpsHistoryByUserId, registerPickup, updatePickup, updatePickupStatusUsingOtp, getPickupsPerInspector, updatePickupStatusToDelivered } from "../controllers/pickup.js";
+import { deletePickup, getPickUpsHistoryByUserId, registerPickup, updatePickup, getPickupsPerInspector, updatePickupStatusToDelivered, verifyPickupImages, confirmPickupOtp } from "../controllers/pickup.js";
 import { authMiddleware } from "../middlewares/authMiddleware.js";
 import upload from "../middlewares/multer.js";
 
@@ -16,8 +16,11 @@ router.route("/:pickupId")
     .delete(authMiddleware, deletePickup)
     .patch(authMiddleware, updatePickup);
 
+router.route("/:pickupId/verify-pickup-images")
+    .patch(authMiddleware, upload.array("images", 3), verifyPickupImages);
+
 router.route("/:pickupId/verify-otp")
-    .patch(authMiddleware, updatePickupStatusUsingOtp);
+    .patch(authMiddleware, confirmPickupOtp);   // no upload middleware — OTP only now
 
 router.route("/:inspectorId")
     .get(authMiddleware, getPickupsPerInspector)

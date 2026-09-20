@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { Bell, Calendar, Coins, KeyRound, Leaf, Package, Recycle } from 'lucide-react'
+import { Bell, Calendar, Coins, KeyRound, Leaf, Package, Recycle, Store } from 'lucide-react'
 import { useAuth } from '../context/AuthContext'
 import { getPickupHistory } from '../api/pickups'
 import StatCard from '../components/StatCard'
@@ -24,8 +24,6 @@ export default function Dashboard() {
   const totalPickups = pickups.length
   const completedPickups = pickups.filter((p) => p.status === 'picked_up').length
   const pendingPickups = pickups.filter((p) => p.status === 'pending' || p.status === 'assigned').length
-  const totalCoins = pickups.reduce((sum, p) => sum + estimateCoins(p.wasteTypes), 0)
-  const wasteKgEstimate = completedPickups * 2.5
 
   const recentPickups = [...pickups]
     .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
@@ -81,13 +79,13 @@ export default function Dashboard() {
       )}
 
       <div className="mb-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <StatCard icon={Coins} label="TrashCoins Earned" value={totalCoins} subtext="Estimated from pickups" accent="coin" />
+        <StatCard icon={Coins} label="TrashCoins Earned" value={user?.trashCoins ?? 0} subtext="Earned from completed pickups" accent="coin" />
         <StatCard icon={Package} label="Total Pickups" value={totalPickups} subtext={`${pendingPickups} active`} accent="t2c" />
-        <StatCard icon={Recycle} label="Waste Recycled" value={`${wasteKgEstimate.toFixed(1)} kg`} subtext="Estimated weight" accent="blue" />
-        <StatCard icon={Leaf} label="CO₂ Saved" value={`${(wasteKgEstimate * 1.2).toFixed(1)} kg`} subtext="Approx. impact" accent="t2c" />
+        <StatCard icon={Recycle} label="Waste Recycled" value={`${Number(user?.wasteRecycled ?? 0).toFixed(1)} kg`} subtext="From completed pickups" accent="blue" />
+        <StatCard icon={Leaf} label="CO₂ Saved" value={`${Number(user?.co2Saved ?? 0).toFixed(1)} kg`} subtext="Approx. impact" accent="t2c" />
       </div>
 
-      <div className="mb-8 grid gap-4 sm:grid-cols-2">
+      <div className="mb-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         <Link
           to="/schedule"
           className="group flex items-center gap-4 rounded-2xl border border-t2c-500/30 bg-gradient-to-br from-t2c-500/20 to-emerald-600/5 p-6 transition hover:border-t2c-500/50"
@@ -111,6 +109,19 @@ export default function Dashboard() {
           <div>
             <h3 className="font-display font-semibold">Pickup History</h3>
             <p className="text-sm text-slate-400">View and manage all requests</p>
+          </div>
+        </Link>
+
+        <Link
+          to="/store"
+          className="group flex items-center gap-4 rounded-2xl border border-coin-500/30 bg-gradient-to-br from-coin-500/15 to-emerald-600/5 p-6 transition hover:border-coin-500/50"
+        >
+          <div className="rounded-xl bg-coin-500 p-3 text-slate-950 shadow-lg shadow-coin-500/20 transition group-hover:scale-105">
+            <Store className="h-6 w-6" />
+          </div>
+          <div>
+            <h3 className="font-display font-semibold">EcoStore</h3>
+            <p className="text-sm text-slate-400">Browse products you can redeem</p>
           </div>
         </Link>
       </div>

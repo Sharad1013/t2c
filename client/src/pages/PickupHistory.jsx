@@ -60,7 +60,7 @@ export default function PickupHistory() {
           </div>
           <h1 className="font-display text-3xl font-bold">Pickup History</h1>
           <p className="mt-2 text-slate-400">
-            Track status, estimated coins, and cancel within 3 minutes of creation.
+            Track status, estimated coins, and cancel within 10 seconds of creation.
           </p>
         </div>
         <Link

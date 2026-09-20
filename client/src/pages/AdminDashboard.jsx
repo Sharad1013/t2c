@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from 'react'
-import { Shield, Truck, Users, Package } from 'lucide-react'
+import { Shield, Truck, Users, Package, Store, Trash2 } from 'lucide-react'
+import AdminEcoStore from './AdminEcoStore'
 import { useAuth } from '../context/AuthContext'
 import {
   fetchAllInspectors,
@@ -7,7 +8,8 @@ import {
   approveRejectPendingInspectors,
   fetchAllUsers,
   fetchAllPickups,
-  fetchPickupsAsPerStatus
+  fetchPickupsAsPerStatus,
+  deleteUser
 } from '../api/admin'
 import Alert from '../components/Alert'
 import LoadingSpinner from '../components/LoadingSpinner'
@@ -18,6 +20,7 @@ const SECTIONS = [
   { id: 'users', label: 'Users', icon: Users },
   { id: 'inspectors', label: 'Inspectors', icon: Truck },
   { id: 'pickups', label: 'Pickups', icon: Package },
+  { id: 'ecostore', label: 'EcoStore', icon: Store },
 ]
 
 const STATUS_FILTERS = [
@@ -37,6 +40,7 @@ const PICKUP_STATUS_FILTERS = [
   { id: 'assigned', label: 'Assigned' },
   { id: 'picked_up', label: 'Picked Up' },
   { id: 'cancelled', label: 'Cancelled' },
+  { id: 'delivered', label: 'Delivered' },
 ]
 
 // build once from your existing states constant, with an "All" option prepended
@@ -61,17 +65,21 @@ export default function AdminDashboard() {
   const [section, setSection] = useState('inspectors')
   const [inspectors, setInspectors] = useState([])
   const [users, setUsers] = useState([])
+  const [userToDelete, setUserToDelete] = useState(null)
   const [statusFilter, setStatusFilter] = useState('all')
 
   const [pickups, setPickups] = useState([])
   const [pickupStatus, setPickupStatus] = useState('all')
   const [pickupState, setPickupState] = useState('all')
+  const [pickupInspector, setPickupInspector] = useState('all')
+  const [inspectorOptions, setInspectorOptions] = useState([])
 
 
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [success, setSuccess] = useState('')
   const [updatingId, setUpdatingId] = useState(null)
+  const [deletingId, setDeletingId] = useState(null)
 
   const loadInspectors = useCallback(async (filter) => {
     setLoading(true)
@@ -104,17 +112,15 @@ export default function AdminDashboard() {
     }
   }, [])
 
-  const loadPickups = useCallback(async (status, state) => {
+  const loadPickups = useCallback(async (status, state, inspectorId) => {
     setLoading(true)
     setError('')
     try {
-      const data =
-        status === 'all' && state === 'all'
-          ? await fetchAllPickups()
-          : await fetchPickupsAsPerStatus(
-            status === 'all' ? undefined : status,
-            state === 'all' ? undefined : state,
-          )
+      const data = await fetchPickupsAsPerStatus(
+        status === 'all' ? undefined : status,
+        state === 'all' ? undefined : state,
+        inspectorId === 'all' ? undefined : inspectorId,
+      )
       setPickups(data.pickups || [])
     } catch (err) {
       setPickups([])
@@ -136,8 +142,15 @@ export default function AdminDashboard() {
 
   useEffect(() => {
     if (section !== 'pickups') return
-    loadPickups(pickupStatus, pickupState)
-  }, [section, pickupStatus, pickupState, loadPickups])
+    loadPickups(pickupStatus, pickupState, pickupInspector)
+  }, [section, pickupStatus, pickupState, pickupInspector, loadPickups])
+
+  useEffect(() => {
+    if (section !== 'pickups') return
+    fetchAllInspectors()
+      .then((data) => setInspectorOptions(data.inspectors || []))
+      .catch(() => setInspectorOptions([]))
+  }, [section])
 
 
   const handleStatusChange = async (inspectorId, nextStatus, currentStatus) => {
@@ -156,6 +169,25 @@ export default function AdminDashboard() {
     }
   }
 
+  const handleDeleteUser = async () => {
+    if (!userToDelete) return
+    const id = userToDelete._id
+    setDeletingId(id)
+    setError('')
+    setSuccess('')
+    try {
+      const data = await deleteUser(id)
+      setSuccess(data.message || 'User deleted.')
+      setUsers((prev) => prev.filter((u) => u._id !== id))
+      setUserToDelete(null)          // close the modal on success
+    } catch (err) {
+      setError(err.message)
+      setUserToDelete(null)          // close so they can see the error alert
+    } finally {
+      setDeletingId(null)
+    }
+  }
+
   return (
     <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6">
       <div className="mb-8">
@@ -167,7 +199,7 @@ export default function AdminDashboard() {
           Hi, {user?.firstName}! 👋
         </h1>
         <p className="mt-2 text-slate-400">
-          Platform overview — manage users, inspectors, and pickups.
+          Platform overview — manage users, inspectors, pickups, and EcoStore.
         </p>
       </div>
 
@@ -204,6 +236,12 @@ export default function AdminDashboard() {
             </div>
           )}
 
+          {success && (
+            <div className="mb-4">
+              <Alert type="success" message={success} onClose={() => setSuccess('')} />
+            </div>
+          )}
+
           {loading ? (
             <div className="flex min-h-[30vh] items-center justify-center">
               <LoadingSpinner size="lg" />
@@ -226,6 +264,7 @@ export default function AdminDashboard() {
                       <th className="px-4 py-3 font-medium">State</th>
                       <th className="px-4 py-3 font-medium">Pincode</th>
                       <th className="px-4 py-3 font-medium">Coins</th>
+                      <th className="px-4 py-3 font-medium">Actions</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-white/5">
@@ -246,6 +285,17 @@ export default function AdminDashboard() {
                         <td className="px-4 py-3 text-slate-400">{u?.address?.state}</td>
                         <td className="px-4 py-3 text-slate-400">{u?.address?.pincode}</td>
                         <td className="px-4 py-3 text-slate-400">{u?.trashCoins}</td>
+                        <td className="px-4 py-3">
+                          <button
+                            onClick={() => setUserToDelete(u)}
+                            disabled={deletingId === u._id}
+                            className="inline-flex items-center gap-1 rounded-lg border border-red-500/30 bg-red-500/10 px-2.5 py-1 text-xs font-medium text-red-400 transition hover:bg-red-500 hover:text-white disabled:cursor-not-allowed disabled:opacity-50"
+                            title="Delete user"
+                          >
+                            <Trash2 className="h-3.5 w-3.5" />
+                            {deletingId === u._id ? 'Deleting…' : 'Delete'}
+                          </button>
+                        </td>
                       </tr>
                     ))}
                   </tbody>
@@ -279,6 +329,16 @@ export default function AdminDashboard() {
               >
                 {STATE_FILTERS.map((f) => (
                   <option key={f.id} value={f.id}>{f.label}</option>
+                ))}
+              </select>
+              <select
+                value={pickupInspector}
+                onChange={(e) => setPickupInspector(e.target.value)}
+                className="min-w-[11rem] rounded-lg border border-white/10 bg-white/5 px-3 py-1.5 text-xs text-slate-200 focus:border-t2c-500 focus:outline-none focus:ring-1 focus:ring-t2c-500"
+              >
+                <option value="all">All Inspectors</option>
+                {inspectorOptions.map((ins) => (
+                  <option key={ins._id} value={ins._id}>{ins.fullName}</option>
                 ))}
               </select>
             </div>
@@ -457,6 +517,43 @@ export default function AdminDashboard() {
               </div>
             </div>
           )}
+        </div>
+      )}
+      {section === 'ecostore' && <AdminEcoStore embedded />}
+
+      {userToDelete && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4">
+          <div className="w-full max-w-sm glass rounded-2xl border border-white/10 p-6">
+            <div className="mb-4 flex items-center gap-3">
+              <div className="rounded-xl bg-red-500/10 p-2.5 text-red-400">
+                <Trash2 className="h-5 w-5" />
+              </div>
+              <h3 className="font-display text-lg font-semibold">Delete user?</h3>
+            </div>
+            <p className="mb-5 text-sm text-slate-400">
+              This will permanently delete{' '}
+              <span className="font-medium text-slate-200">
+                {userToDelete.firstName} {userToDelete.lastName}
+              </span>{' '}
+              ({userToDelete.email}). This can't be undone.
+            </p>
+            <div className="flex justify-end gap-2">
+              <button
+                onClick={() => setUserToDelete(null)}
+                disabled={deletingId === userToDelete._id}
+                className="rounded-lg border border-white/10 px-4 py-2 text-sm text-slate-300 hover:bg-white/5 disabled:opacity-50"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleDeleteUser}
+                disabled={deletingId === userToDelete._id}
+                className="rounded-lg bg-red-500 px-4 py-2 text-sm font-medium text-white hover:bg-red-600 disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                {deletingId === userToDelete._id ? 'Deleting…' : 'Delete'}
+              </button>
+            </div>
+          </div>
         </div>
       )}
     </div>

@@ -1,15 +1,16 @@
 import { Pickup } from "../../models/pickup.js";
 
 export const fetchPickupsAsPerStatus = async (req, res) => {
-    const { status, state } = req.query;
+    const { status, state, inspectorId } = req.query;
     const filter = {};
+
     try {
-        if (!status && !state) {
-            return res.status(400).json({
-                success: false,
-                message: `Invalid status or state.`,
-            });
-        }
+        // if (!status && !state && !inspectorId) {
+        //     return res.status(400).json({
+        //         success: false,
+        //         message: `Invalid status, state or inspectorID.`,
+        //     });
+        // }
 
         if (status) {
             filter.status = status;
@@ -17,6 +18,10 @@ export const fetchPickupsAsPerStatus = async (req, res) => {
 
         if (state) {
             filter["address.state"] = state;
+        }
+
+        if (inspectorId) {
+            filter.inspectorId = inspectorId;
         }
 
         const pickups = await Pickup.find(filter)

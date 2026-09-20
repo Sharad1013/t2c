@@ -7,8 +7,6 @@ import { generateOTP } from "../utils/otpGenerator.js";
 export const registerUser = async (req, res) => {
     try {
         const { firstName, lastName, phone, email, password, address } = req.body;
-
-        console.log("got the fields", { firstName, lastName, phone, email, password, address });
         const hasMissingFields = [firstName, lastName, phone, email, password, address].some((item) => item == null || item === "");
 
         if (hasMissingFields) {

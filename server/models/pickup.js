@@ -66,6 +66,20 @@ const pickUpSchema = new Schema({
         type: Date,
         default: null
     },
+    pickedUpImageUrls: {
+        type: [String],
+        default: [],
+        validate: {
+            validator: function (images) {
+                return !images || images.length <= 3;
+            },
+            message: "You can upload a maximum of 3 images."
+        }
+    },
+    pickedUpAt: {
+        type: Date,
+        default: null
+    }
 }, { timestamps: true })
 
 export const Pickup = model('Pickups', pickUpSchema);

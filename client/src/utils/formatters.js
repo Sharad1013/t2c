@@ -1,3 +1,13 @@
+export function formatInr(amount, currency = 'INR') {
+  const value = Number(amount)
+  if (Number.isNaN(value)) return '—'
+  return new Intl.NumberFormat('en-IN', {
+    style: 'currency',
+    currency,
+    maximumFractionDigits: 0,
+  }).format(value)
+}
+
 export function formatDate(dateString) {
   if (!dateString) return '—'
   return new Date(dateString).toLocaleDateString('en-IN', {
@@ -44,6 +54,6 @@ export function canDeletePickup(createdAt) {
 
 export function deleteTimeRemaining(createdAt) {
   if (!createdAt) return 0
-  const remaining = 3 * 60 * 1000 - (Date.now() - new Date(createdAt).getTime())
+  const remaining = 10 * 1000 - (Date.now() - new Date(createdAt).getTime())
   return Math.max(0, Math.ceil(remaining / 1000))
 }
