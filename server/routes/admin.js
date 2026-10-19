@@ -7,7 +7,7 @@ import { deleteUser, getAllUsers } from "../controllers/admin/users.js";
 import { fetchAllPickups, fetchPickupsAsPerStatus } from "../controllers/admin/pickups.js";
 import { getAllProducts, getProductDetails } from "../controllers/ecoStore/ecostore.js";
 import { createEcoStoreProduct, deleteEcoStoreProduct, updateEcoStoreProduct } from "../controllers/admin/ecoStoreAdminControl.js";
-import { updateResaleProduct } from "../controllers/admin/resaleStoreAdminControl.js";
+import { updateResaleProduct, getAllResaleProductsAdmin, deleteResaleProductAdmin } from "../controllers/admin/resaleStoreAdminControl.js";
 
 import upload from "../middlewares/multer.js";
 const router = express.Router();
@@ -52,7 +52,11 @@ router.route("/products/:productId")
 
 
 // ResaleStore - admin-gated by router.use above
+router.route("/resaleProducts")
+    .get(getAllResaleProductsAdmin);
+
 router.route("/resaleProducts/:resaleProductId")
     .patch(updateResaleProduct)
+    .delete(deleteResaleProductAdmin);
 
 export default router;

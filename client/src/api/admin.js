@@ -91,3 +91,19 @@ export async function deleteAdminProduct(productId) {
   const { data } = await api.delete(`/admin/products/${productId}`)
   return data
 }
+
+export async function fetchAdminResaleProducts(status) {
+  const params = status && status !== 'all' ? { status } : {}
+  const { data } = await api.get('/admin/resaleProducts', { params })
+  return data
+}
+
+export async function updateAdminResaleProduct(productId, updateData) {
+  const { data } = await api.patch(`/admin/resaleProducts/${productId}`, updateData)
+  return data
+}
+
+export async function deleteAdminResaleProduct(productId) {
+  const { data } = await api.delete(`/admin/resaleProducts/${productId}`)
+  return data
+}

@@ -1,5 +1,26 @@
 import { ResaleStoreProducts } from "../../models/resaleStore/resaleStoreProducts.js";
-import { uploadToCloudinary } from "../../utils/cloudinary.js";
+
+export const getAllResaleProductsAdmin = async (req, res) => {
+    try {
+        const { status } = req.query;
+        const query = status && status !== "all" ? { status } : {};
+        const resaleProducts = await ResaleStoreProducts.find(query)
+            .populate("seller", "firstName lastName email phone")
+            .populate("verifiedBy", "firstName lastName email")
+            .sort({ createdAt: -1 });
+
+        return res.status(200).json({
+            success: true,
+            message: `Fetched ${resaleProducts.length} resale products.`,
+            resaleProducts
+        });
+    } catch (err) {
+        return res.status(500).json({
+            success: false,
+            message: `Error while fetching resale products: ${err.message}`,
+        });
+    }
+};
 
 export const updateResaleProduct = async (req, res) => {
     try {
@@ -8,7 +29,7 @@ export const updateResaleProduct = async (req, res) => {
             return res.status(401).json({ success: false, message: "Login first." });
         }
 
-        const { productId } = req.params;
+        const productId = req.params.resaleProductId || req.params.productId;
         const { name, description, brand, stock, price, liveFrom, liveTill, status, rejectionReason } = req.body;
 
         const product = await ResaleStoreProducts.findById(productId);
@@ -39,7 +60,7 @@ export const updateResaleProduct = async (req, res) => {
                 if (Number.isNaN(p) || p <= 0) {
                     return res.status(400).json({ success: false, message: "A price is required to make a product live." });
                 }
-                const from = liveFrom ? new Date(liveFrom) : product.liveFrom;
+                const from = liveFrom ? new Date(liveFrom) : (product.liveFrom || new Date());
                 const till = liveTill ? new Date(liveTill) : product.liveTill;
                 if (!from || !till) {
                     return res.status(400).json({ success: false, message: "liveFrom and liveTill are required to make a product live." });
@@ -62,8 +83,11 @@ export const updateResaleProduct = async (req, res) => {
                 updates.verifiedBy = adminId;
                 updates.verifiedAt = new Date();
             } else {
-                // any other allowed status transition (approved, sold, expired…)
+                // any other allowed status transition (approved, sold, expired, pending_review…)
                 updates.status = status;
+                if (price !== undefined) updates.price = Number(price);
+                if (liveFrom !== undefined) updates.liveFrom = new Date(liveFrom);
+                if (liveTill !== undefined) updates.liveTill = new Date(liveTill);
             }
         } else {
             // no status change, but admin may still be setting price/dates independently
@@ -86,17 +110,39 @@ export const updateResaleProduct = async (req, res) => {
             productId,
             { $set: updates },
             { new: true, runValidators: true }
-        );
+        )
+        .populate("seller", "firstName lastName email phone")
+        .populate("verifiedBy", "firstName lastName email");
 
         return res.status(200).json({
             success: true,
             message: "Resale product updated successfully.",
             resaleProduct: updated,
+            product: updated
         });
     } catch (err) {
         return res.status(500).json({
             success: false,
-            message: `Error while updating resale product ${err.message}`,
+            message: `Error while updating resale product: ${err.message}`,
+        });
+    }
+};
+
+export const deleteResaleProductAdmin = async (req, res) => {
+    try {
+        const productId = req.params.resaleProductId || req.params.productId;
+        const deleted = await ResaleStoreProducts.findByIdAndDelete(productId);
+        if (!deleted) {
+            return res.status(404).json({ success: false, message: "Product not found." });
+        }
+        return res.status(200).json({
+            success: true,
+            message: "Resale product deleted successfully.",
+        });
+    } catch (err) {
+        return res.status(500).json({
+            success: false,
+            message: `Error deleting resale product: ${err.message}`
         });
     }
 };
