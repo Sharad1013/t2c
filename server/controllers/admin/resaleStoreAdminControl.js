@@ -1,4 +1,4 @@
-import { resaleStoreProducts } from "../../models/resaleStore/resaleStoreProducts.js";
+import { ResaleStoreProducts } from "../../models/resaleStore/resaleStoreProducts.js";
 import { uploadToCloudinary } from "../../utils/cloudinary.js";
 
 export const updateResaleProduct = async (req, res) => {
