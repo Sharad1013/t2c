@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { Bell, Calendar, Coins, KeyRound, Leaf, Package, Recycle, Store } from 'lucide-react'
+import { Bell, Calendar, Coins, KeyRound, Leaf, Package, Recycle, Store, ShoppingBag } from 'lucide-react'
 import { useAuth } from '../context/AuthContext'
 import { getPickupHistory } from '../api/pickups'
 import StatCard from '../components/StatCard'
@@ -85,43 +85,56 @@ export default function Dashboard() {
         <StatCard icon={Leaf} label="CO₂ Saved" value={`${Number(user?.co2Saved ?? 0).toFixed(1)} kg`} subtext="Approx. impact" accent="t2c" />
       </div>
 
-      <div className="mb-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      <div className="mb-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <Link
           to="/schedule"
-          className="group flex items-center gap-4 rounded-2xl border border-t2c-500/30 bg-gradient-to-br from-t2c-500/20 to-emerald-600/5 p-6 transition hover:border-t2c-500/50"
+          className="group flex items-center gap-4 rounded-2xl border border-t2c-500/30 bg-gradient-to-br from-t2c-500/20 to-emerald-600/5 p-5 transition hover:border-t2c-500/50"
         >
           <div className="rounded-xl bg-t2c-500 p-3 text-white shadow-lg shadow-t2c-500/30 transition group-hover:scale-105">
-            <Bell className="h-6 w-6" />
+            <Bell className="h-5 w-5" />
           </div>
           <div>
-            <h3 className="font-display font-semibold">Ring the Bell</h3>
-            <p className="text-sm text-slate-400">Schedule a new doorstep pickup</p>
+            <h3 className="font-display font-semibold text-sm">Schedule Pickup</h3>
+            <p className="text-xs text-slate-400">Doorstep waste pickup</p>
           </div>
         </Link>
 
         <Link
           to="/history"
-          className="group flex items-center gap-4 rounded-2xl border border-white/10 bg-white/5 p-6 transition hover:border-white/20"
+          className="group flex items-center gap-4 rounded-2xl border border-white/10 bg-white/5 p-5 transition hover:border-white/20"
         >
           <div className="rounded-xl bg-white/10 p-3 text-slate-300 transition group-hover:scale-105">
-            <Calendar className="h-6 w-6" />
+            <Calendar className="h-5 w-5" />
           </div>
           <div>
-            <h3 className="font-display font-semibold">Pickup History</h3>
-            <p className="text-sm text-slate-400">View and manage all requests</p>
+            <h3 className="font-display font-semibold text-sm">Pickup History</h3>
+            <p className="text-xs text-slate-400">View and manage requests</p>
           </div>
         </Link>
 
         <Link
           to="/store"
-          className="group flex items-center gap-4 rounded-2xl border border-coin-500/30 bg-gradient-to-br from-coin-500/15 to-emerald-600/5 p-6 transition hover:border-coin-500/50"
+          className="group flex items-center gap-4 rounded-2xl border border-coin-500/30 bg-gradient-to-br from-coin-500/15 to-emerald-600/5 p-5 transition hover:border-coin-500/50"
         >
           <div className="rounded-xl bg-coin-500 p-3 text-slate-950 shadow-lg shadow-coin-500/20 transition group-hover:scale-105">
-            <Store className="h-6 w-6" />
+            <Store className="h-5 w-5" />
           </div>
           <div>
-            <h3 className="font-display font-semibold">EcoStore</h3>
-            <p className="text-sm text-slate-400">Browse products you can redeem</p>
+            <h3 className="font-display font-semibold text-sm">EcoStore</h3>
+            <p className="text-xs text-slate-400">Redeem with TrashCoins</p>
+          </div>
+        </Link>
+
+        <Link
+          to="/resale"
+          className="group flex items-center gap-4 rounded-2xl border border-emerald-500/30 bg-gradient-to-br from-emerald-500/15 to-teal-600/5 p-5 transition hover:border-emerald-500/50"
+        >
+          <div className="rounded-xl bg-emerald-600 p-3 text-white shadow-lg shadow-emerald-600/20 transition group-hover:scale-105">
+            <ShoppingBag className="h-5 w-5" />
+          </div>
+          <div>
+            <h3 className="font-display font-semibold text-sm">Resale Store</h3>
+            <p className="text-xs text-slate-400">Sell & buy pre-loved goods</p>
           </div>
         </Link>
       </div>

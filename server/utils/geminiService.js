@@ -93,3 +93,32 @@ Respond ONLY with JSON, no markdown:
     const clean = text.replace(/```json|```/g, "").trim();
     return JSON.parse(clean);
 };
+
+export const analyzeProductImage = async (files) => {
+    const model = genAI.getGenerativeModel({ model: "gemini-3.5-flash" });
+
+    const imageParts = files.map((file) => ({
+        inlineData: {
+            data: file.buffer.toString("base64"),
+            mimeType: file.mimetype,
+        },
+    }));
+
+    const prompt = `
+    You are a product-valuation AI for a resale marketplace called Trash2Cash.
+    You are given ${files.length} image(s) of a single second-hand product a user wants to resell.
+    Analyze all images together and respond ONLY in this JSON format, nothing else:
+    {
+        "category": "electronics | furniture | clothing | appliances | books | toys | other",
+        "estimatedValueRs": <number — estimated fair second-hand resale value in Indian Rupees>,
+        "confidence": "low | medium | high",
+        "description": "<one line describing the product and its visible condition>"
+    }
+    `;
+
+    const result = await model.generateContent([prompt, ...imageParts]);
+    const text = result.response.text();
+
+    const clean = text.replace(/```json|```/g, "").trim();
+    return JSON.parse(clean);
+};

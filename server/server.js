@@ -6,6 +6,7 @@ import userRouter from "./routes/user.js";
 import pickupRouter from "./routes/pickup.js";
 import inspectorRouter from "./routes/inspector.js";
 import notificationRouter from "./routes/notificationRoutes.js";
+import resaleStoreRouter from "./routes/resaleStore.js";
 
 // Admin Controls
 import adminRouter from "./routes/admin.js";
@@ -44,6 +45,7 @@ app.use("/api/v1/pickups", pickupRouter);
 app.use("/api/v1/inspectors", inspectorRouter);
 app.use("/api/v1/notifications", notificationRouter);
 app.use("/api/v1/products", ecoStoreRouter);
+app.use("/api/v1/resale", resaleStoreRouter);
 
 connectDB().then(() => {
     app.listen(3000, () => {

@@ -16,6 +16,7 @@ import PickupHistory from './pages/PickupHistory'
 import Profile from './pages/Profile'
 import EcoStore from './pages/EcoStore'
 import AdminEcoStore from './pages/AdminEcoStore'
+import ResaleStore from './pages/ResaleStore'
 
 function DashboardGate() {
   const { role } = useAuth()
@@ -102,6 +103,14 @@ export default function App() {
               element={
                 <ProtectedRoute allowedRoles={['user', 'admin', 'inspector']}>
                   <StoreGate />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/resale"
+              element={
+                <ProtectedRoute allowedRoles={['user', 'admin', 'inspector']}>
+                  <ResaleStore />
                 </ProtectedRoute>
               }
             />

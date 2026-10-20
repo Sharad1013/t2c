@@ -59,6 +59,9 @@ export default function Navbar() {
                 <NavLink to="/store" className={inspectorNavLinkClass}>
                   EcoStore
                 </NavLink>
+                <NavLink to="/resale" className={inspectorNavLinkClass}>
+                  Resale Store
+                </NavLink>
                 <NavLink to="/inspector/profile" className={inspectorNavLinkClass}>
                   Profile
                 </NavLink>
@@ -71,6 +74,9 @@ export default function Navbar() {
                 <NavLink to="/store" className={navLinkClass}>
                   EcoStore
                 </NavLink>
+                <NavLink to="/resale" className={navLinkClass}>
+                  Resale Store
+                </NavLink>
               </>
             ) : (
               <>
@@ -79,6 +85,9 @@ export default function Navbar() {
                 </NavLink>
                 <NavLink to="/store" className={navLinkClass}>
                   EcoStore
+                </NavLink>
+                <NavLink to="/resale" className={navLinkClass}>
+                  Resale Store
                 </NavLink>
                 <NavLink to="/schedule" className={navLinkClass}>
                   Schedule Pickup
@@ -200,6 +209,9 @@ export default function Navbar() {
                   <NavLink to="/store" className={inspectorNavLinkClass} onClick={() => setMobileOpen(false)}>
                     EcoStore
                   </NavLink>
+                  <NavLink to="/resale" className={inspectorNavLinkClass} onClick={() => setMobileOpen(false)}>
+                    Resale Store
+                  </NavLink>
                   <NavLink to="/inspector/profile" className={inspectorNavLinkClass} onClick={() => setMobileOpen(false)}>
                     Profile
                   </NavLink>
@@ -219,6 +231,9 @@ export default function Navbar() {
                   <NavLink to="/store" className={navLinkClass} onClick={() => setMobileOpen(false)}>
                     EcoStore
                   </NavLink>
+                  <NavLink to="/resale" className={navLinkClass} onClick={() => setMobileOpen(false)}>
+                    Resale Store
+                  </NavLink>
                   <NavLink to="/profile" className={navLinkClass} onClick={() => setMobileOpen(false)}>
                     Profile
                   </NavLink>
@@ -237,6 +252,9 @@ export default function Navbar() {
                   </NavLink>
                   <NavLink to="/store" className={navLinkClass} onClick={() => setMobileOpen(false)}>
                     EcoStore
+                  </NavLink>
+                  <NavLink to="/resale" className={navLinkClass} onClick={() => setMobileOpen(false)}>
+                    Resale Store
                   </NavLink>
                   <NavLink to="/schedule" className={navLinkClass} onClick={() => setMobileOpen(false)}>
                     Schedule Pickup

@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from 'react'
-import { Shield, Truck, Users, Package, Store, Trash2 } from 'lucide-react'
+import { Shield, Truck, Users, Package, Store, Trash2, ShoppingBag } from 'lucide-react'
 import AdminEcoStore from './AdminEcoStore'
+import AdminResaleManagement from '../components/resaleStore/AdminResaleManagement'
 import { useAuth } from '../context/AuthContext'
 import {
   fetchAllInspectors,
@@ -21,6 +22,7 @@ const SECTIONS = [
   { id: 'inspectors', label: 'Inspectors', icon: Truck },
   { id: 'pickups', label: 'Pickups', icon: Package },
   { id: 'ecostore', label: 'EcoStore', icon: Store },
+  { id: 'resalestore', label: 'Resale Store', icon: ShoppingBag },
 ]
 
 const STATUS_FILTERS = [
@@ -520,6 +522,7 @@ export default function AdminDashboard() {
         </div>
       )}
       {section === 'ecostore' && <AdminEcoStore embedded />}
+      {section === 'resalestore' && <AdminResaleManagement embedded />}
 
       {userToDelete && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4">

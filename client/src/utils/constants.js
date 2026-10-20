@@ -41,3 +41,12 @@ export const INSPECTOR_STATUS = {
   rejected: { label: 'Rejected', color: 'bg-red-500/20 text-red-300 border-red-500/30' },
   suspended: { label: 'Suspended', color: 'bg-slate-500/20 text-slate-300 border-slate-500/30' },
 }
+
+export const RESALE_STATUS = {
+  pending_review: { label: 'Under Review', color: 'bg-amber-500/20 text-amber-300 border-amber-500/30' },
+  approved: { label: 'Approved', color: 'bg-blue-500/20 text-blue-300 border-blue-500/30' },
+  live: { label: 'Live in Store', color: 'bg-t2c-500/20 text-t2c-300 border-t2c-500/30' },
+  rejected: { label: 'Rejected', color: 'bg-red-500/20 text-red-300 border-red-500/30' },
+  sold: { label: 'Sold', color: 'bg-purple-500/20 text-purple-300 border-purple-500/30' },
+  expired: { label: 'Expired', color: 'bg-slate-500/20 text-slate-300 border-slate-500/30' },
+}
